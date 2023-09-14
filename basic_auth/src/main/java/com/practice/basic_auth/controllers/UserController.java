@@ -28,9 +28,9 @@ public class UserController {
 
   //create user
   @PostMapping("/")
-  public ResponseEntity<User> createUser(@RequestBody User user){
+  public String createUser(@RequestBody User user){
     User createdUser= userService.createUser(user);
-    return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    return "User Successfully created... now you can login with you credentials.." ;
   }
 
   //delete user
