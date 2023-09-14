@@ -8,7 +8,7 @@ import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
-public class BasicAuthApplication implements CommandLineRunner {
+public class BasicAuthApplication{
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -17,8 +17,5 @@ public class BasicAuthApplication implements CommandLineRunner {
 		SpringApplication.run(BasicAuthApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		System.out.println(passwordEncoder.encode("12345"));
-	}
+
 }

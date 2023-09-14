@@ -10,6 +10,7 @@ import com.practice.basic_auth.services.UserService;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,11 +18,13 @@ public class UserServiceimpl implements UserService {
 
 
   @Autowired
+  private PasswordEncoder passwordEncoder;
+  @Autowired
   private UserRepo userRepo;
 
   @Override
   public User createUser(User user) {
-
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
     User savedUser = userRepo.save(user);
 
     return savedUser;
