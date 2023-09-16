@@ -1,11 +1,12 @@
 package com.practice.basic_auth.repositories;
 
 import com.practice.basic_auth.entities.User;
+import com.practice.basic_auth.payloads.UserDto;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, Integer> {
-  User findByEmail(String email);
+  UserDto findByEmail(String email);
 }
