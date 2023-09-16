@@ -23,7 +23,7 @@ public class UserServiceimpl implements UserService {
   public OutputResponse<UserDto> createUser(User user) {
 
 
-    User existingUser = userRepo.findByEmail(user.getEmail());
+    UserDto existingUser = userRepo.findByEmail(user.getEmail());
 
     if(existingUser == null){
       user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -37,11 +37,11 @@ public class UserServiceimpl implements UserService {
   @Override
   public OutputResponse<UserDto> getUser(String email, String password) {
 
-    User user=userRepo.findByEmail(email);
+    UserDto user=userRepo.findByEmail(email);
 
     if (user != null) {
       if (passwordEncoder.matches(password, user.getPassword())) {
-        return new OutputResponse<>(true,  new UserDto(user), "User logged in successfully.");
+        return new OutputResponse<>(true,  user, "User logged in successfully.");
 
       }
       else{

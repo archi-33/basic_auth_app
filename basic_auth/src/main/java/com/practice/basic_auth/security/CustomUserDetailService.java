@@ -3,6 +3,7 @@ package com.practice.basic_auth.security;
 import com.practice.basic_auth.entities.User;
 import com.practice.basic_auth.exceptions.ResourceNotFoundException;
 import com.practice.basic_auth.payloads.ApiResponse;
+import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,9 +18,9 @@ public class CustomUserDetailService implements UserDetailsService {
   private UserRepo userRepo;
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     //loading user by username
-    User user=userRepo.findByEmail(username);
-    return (UserDetails) user;
+    UserDto user=userRepo.findByEmail(email);
+    return user;
   }
 }
