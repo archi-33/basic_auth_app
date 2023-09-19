@@ -15,15 +15,16 @@ import org.springframework.stereotype.Component;
 public class JwtHelper {
   public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
-  //    public static final long JWT_TOKEN_VALIDITY =  60;
-  private String secret = "MySecretKey";
 
-  //retrieve username from jwt token
-  public String getEmailFromToken(String token) {
+  // public static final long JWT_TOKEN_VALIDITY = 60;
+  private String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
+
+  // retrieve username from jwt token
+  public String getUsernameFromToken(String token) {
     return getClaimFromToken(token, Claims::getSubject);
   }
 
-  //retrieve expiration date from jwt token
+  // retrieve expiration date from jwt token
   public Date getExpirationDateFromToken(String token) {
     return getClaimFromToken(token, Claims::getExpiration);
   }
@@ -33,22 +34,23 @@ public class JwtHelper {
     return claimsResolver.apply(claims);
   }
 
-  //for retrieveing any information from token we will need the secret key
+  // for retrieveing any information from token we will need the secret key
   private Claims getAllClaimsFromToken(String token) {
     return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
   }
 
-  //check if the token has expired
+  // check if the token has expired
   private Boolean isTokenExpired(String token) {
     final Date expiration = getExpirationDateFromToken(token);
     return expiration.before(new Date());
   }
 
-  //generate token for user
+  // generate token for user
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
     return doGenerateToken(claims, userDetails.getUsername());
   }
+
 
   private String doGenerateToken(Map<String, Object> claims, String subject) {
 
@@ -57,11 +59,10 @@ public class JwtHelper {
         .signWith(SignatureAlgorithm.HS512, secret).compact();
   }
 
-  //validate token
+  // validate token
   public Boolean validateToken(String token, UserDetails userDetails) {
-    final String username = getEmailFromToken(token);
+    final String username = getUsernameFromToken(token);
     return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
   }
-
 
 }
