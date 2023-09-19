@@ -27,24 +27,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 
   @Autowired
-  private CustomUserDetailService customUserDetailService;
+  private UserDetailsService userDetailsService;
 
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
     String requestHeader = request.getHeader("Authorization");
     //Bearer 2352345235sdfrsfgsdfsdf
     logger.info(" Header :  {}", requestHeader);
-    String email = null;
+    String username = null;
     String token = null;
     if (requestHeader != null && requestHeader.startsWith("Bearer")) {
       //looking good
       token = requestHeader.substring(7);
       try {
 
-        email = this.jwtHelper.getEmailFromToken(token);
+        username = this.jwtHelper.getUsernameFromToken(token);
 
       } catch (IllegalArgumentException e) {
         logger.info("Illegal Argument while fetching the username !!");
@@ -67,11 +67,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 
     //
-    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 
       //fetch user detail from username
-      UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
+      UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
       Boolean validateToken = this.jwtHelper.validateToken(token, userDetails);
       if (validateToken) {
 
@@ -89,7 +89,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
-
 
   }
 

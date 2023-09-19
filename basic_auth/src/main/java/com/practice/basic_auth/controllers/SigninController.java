@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController {
+public class SigninController {
 
   @Autowired
   private JwtHelper jwtHelper;
@@ -29,7 +31,7 @@ public class AuthController {
 
   @PostMapping("/login")
   public ResponseEntity<JwtResponse> createToken(@RequestBody JwtRequest jwtRequest){
-    this.authenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
+    this.doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
     UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
     String token= jwtHelper.generateToken(user);
     JwtResponse response = new JwtResponse();
@@ -37,9 +39,14 @@ public class AuthController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  public void authenticate(String username, String password){
+  public void doAuthenticate(String username, String password){
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
     authenticationManager.authenticate(authenticationToken);
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public String exceptionHandler(){
+    return "Bad Credentials!!!!!!!!!!!!!!";
   }
 
 }
