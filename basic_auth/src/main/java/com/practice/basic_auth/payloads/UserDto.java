@@ -16,12 +16,14 @@ public class UserDto  {
   private String lastName;
   private String gender;
 
+
   public UserDto(User user){
     this.id = user.getId();
     this.email= user.getEmail();
     this.firstName= user.getFirstName();
     this.lastName= user.getLastName();
     this.gender= user.getGender();
+    ;
   }
 
 

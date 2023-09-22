@@ -1,8 +1,13 @@
 package com.practice.basic_auth.controllers;
 
+import com.practice.basic_auth.entities.User;
+import com.practice.basic_auth.payloads.ApiResponse;
 import com.practice.basic_auth.payloads.JwtRequest;
 import com.practice.basic_auth.payloads.JwtResponse;
+import com.practice.basic_auth.payloads.OutputResponse;
+import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.security.JwtHelper;
+import com.practice.basic_auth.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-public class SigninController {
+public class SigninSignUpController {
 
   @Autowired
   private JwtHelper jwtHelper;
@@ -29,14 +34,34 @@ public class SigninController {
   @Autowired
   private AuthenticationManager authenticationManager;
 
+  @Autowired
+  private UserService userService;
+
+
+  //create user
+  @PostMapping("/signup")
+  public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
+    OutputResponse<UserDto> createdUser= userService.createUser(user);
+    if(createdUser.getSuccess()){
+      return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
+    }else
+      return new ResponseEntity<>((new ApiResponse("error",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
+  }
+
   @PostMapping("/login")
-  public ResponseEntity<JwtResponse> createToken(@RequestBody JwtRequest jwtRequest){
+  public ResponseEntity<ApiResponse> createToken(@RequestBody JwtRequest jwtRequest){
     this.doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
-    UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
+    final UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
     String token= jwtHelper.generateToken(user);
-    JwtResponse response = new JwtResponse();
-    response.setToken(token);
-    return new ResponseEntity<>(response, HttpStatus.OK);
+//    ApiResponse response = new ApiResponse();
+//    response.setData(token);
+    OutputResponse<UserDto> getUser= userService.getUser(jwtRequest.getEmail(),
+        jwtRequest.getPassword());
+    if(getUser.getSuccess()){
+      return new ResponseEntity<>((new ApiResponse("success","token = "+token,null)), HttpStatus.CREATED);
+    }else
+      return new ResponseEntity<>((new ApiResponse("error",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
+
   }
 
   public void doAuthenticate(String username, String password){

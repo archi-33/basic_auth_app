@@ -5,14 +5,19 @@ import com.practice.basic_auth.payloads.OutputResponse;
 import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.repositories.UserRepo;
 import com.practice.basic_auth.services.UserService;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import org.hibernate.result.Output;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceimpl implements UserService {
+  public static final String DEFAULT_ROLE= "ROLE_USER";
 
 
   @Autowired
@@ -24,10 +29,12 @@ public class UserServiceimpl implements UserService {
   public OutputResponse<UserDto> createUser(User user) {
 
 
+
     Optional<User> existingUserOpt = userRepo.findByEmail(user.getEmail());
 
     if(existingUserOpt.isEmpty()){
       user.setPassword(passwordEncoder.encode(user.getPassword()));
+      user.setRole(DEFAULT_ROLE);
       User savedUser = userRepo.save(user);
 
       UserDto userDto = new UserDto();
@@ -65,5 +72,44 @@ public class UserServiceimpl implements UserService {
     }else
       return new OutputResponse<>(false, null, "Entered Email ID does not exist");
   }
+
+  public User getLoggedInUser(Principal principal){
+    return userRepo.findByEmail(principal.getName()).get();
+  }
+
+  public static final String[] adminAccess= {"ROLE_ADMIN", "ROLE_USER"};
+  public List<String> getRolesOfLoggedInUser(Principal principal){
+    String roles = getLoggedInUser(principal).getRole();
+    List<String> assignRoles = Arrays.stream(roles.split(",")).collect(Collectors.toList());
+    if(assignRoles.contains("ROLE_ADMIN")) {
+      return Arrays.stream(adminAccess).collect(Collectors.toList());
+    }
+    else
+      return List.of(new String[]{"ROLE_USER"});
+  }
+  public String giveAccess(String email, String userRole, Principal principal){
+    User user = userRepo.findByEmail(email).get();
+    List<String> activeRoles = getRolesOfLoggedInUser(principal);
+    String newRole ="";
+    if(activeRoles.contains(userRole)){
+      newRole= user.getRole()+","+userRole;
+      user.setRole(newRole);
+    }
+    userRepo.save(user);
+    return "Hello!!! "+user.getEmail()+". New Role has been assigned to you by "+principal.getName()+"i.e., "+user.getRole();
+  }
+
+  @Override
+  public List<UserDto> loadAll() {
+    List<User> list = userRepo.findAll();
+    List<UserDto> newList= new ArrayList<>();
+    for(int i =0; i<list.size(); i++){
+      newList.add(new UserDto(list.get(i)));
+    }
+
+
+    return newList;
+  }
+
 
 }
