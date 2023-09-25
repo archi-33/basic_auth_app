@@ -121,6 +121,7 @@ public class UserServiceimpl implements UserService {
       loggedinUser.setFirstName(user.getFirstName());
       loggedinUser.setLastName(user.getLastName());
       loggedinUser.setPassword(passwordEncoder.encode(user.getPassword()));
+      userRepo.save(loggedinUser);
 
     }
     else{

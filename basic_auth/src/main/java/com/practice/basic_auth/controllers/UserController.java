@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth/role")
+@RequestMapping("/api/auth")
 @EnableMethodSecurity
 public class UserController {
   @Autowired
@@ -38,22 +38,21 @@ public class UserController {
 
 
   @GetMapping("/access")
-  @Secured("ROLE_ADMIN")
-  @PreAuthorize("ROLE_ADMIN")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public  String giveAccessToUser(@RequestParam String email, @RequestParam String userRole, Principal principal){
     return userService.giveAccess(email, userRole, principal);
   }
 
   @GetMapping("/fetchAllUsers")
-  @PreAuthorize("ROLE_ADMIN")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public List<UserDto> loadUsers(){
     return userService.loadAll();
   }
 
 
   @PutMapping("/update")
-  @PreAuthorize("ROLE_USER")
-  public ResponseEntity<ApiResponse> updateUserDetail(User user, Principal principal) {
+  @PreAuthorize("hasRole('ROLE_USER')")
+  public ResponseEntity<ApiResponse> updateUserDetail(@RequestBody User user, Principal principal) {
     OutputResponse<UserDto> getUser =userService.update(user, principal);
     if(getUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success",getUser.getData(),null)), HttpStatus.OK);
@@ -83,8 +82,7 @@ public class UserController {
 //  }
 
   @GetMapping("/getName")
-  @PreAuthorize("hasAuthority('ROLE_USER')")
-  @Secured("ROLE_USER")
+  @PreAuthorize("hasRole('ROLE_USER')")
   public String giveName(Principal principal){
     return principal.getName();
   }
