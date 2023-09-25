@@ -8,6 +8,7 @@ import com.practice.basic_auth.payloads.OutputResponse;
 import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.security.JwtHelper;
 import com.practice.basic_auth.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class SigninSignUpController {
     if(createdUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
     }else
-      return new ResponseEntity<>((new ApiResponse("error",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>((new ApiResponse("failure",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
   }
 
   @PostMapping("/login")
@@ -60,7 +61,7 @@ public class SigninSignUpController {
     if(getUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success","token = "+token,null)), HttpStatus.CREATED);
     }else
-      return new ResponseEntity<>((new ApiResponse("error",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>((new ApiResponse("failure",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
 
   }
 

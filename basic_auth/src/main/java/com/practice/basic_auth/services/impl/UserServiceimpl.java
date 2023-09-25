@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -109,6 +110,26 @@ public class UserServiceimpl implements UserService {
 
 
     return newList;
+  }
+
+  @Override
+  public OutputResponse<UserDto> update(User user, Principal principal) {
+    User loggedinUser = userRepo.findByEmail(principal.getName()).get();
+    Optional<User> ifPresent = userRepo.findByEmail(user.getEmail());
+    if(ifPresent.isEmpty()){
+      loggedinUser.setEmail(user.getEmail());
+      loggedinUser.setFirstName(user.getFirstName());
+      loggedinUser.setLastName(user.getLastName());
+      loggedinUser.setPassword(passwordEncoder.encode(user.getPassword()));
+      userRepo.save(loggedinUser);
+
+    }
+    else{
+      return new OutputResponse<>(false, null,"Given mail id is already present...!!!!");
+
+    }
+    return new OutputResponse<>(true, new UserDto(user),"The user details are successfully updated...");
+
   }
 
 

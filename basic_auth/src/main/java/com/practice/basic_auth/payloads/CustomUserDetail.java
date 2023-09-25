@@ -18,7 +18,6 @@ public class CustomUserDetail implements UserDetails {
   private User user;
 
   public CustomUserDetail(User user) {
-
     this.email = user.getEmail();
     this.password= user.getPassword();
     this.isActive = user.isActive();

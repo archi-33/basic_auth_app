@@ -16,4 +16,6 @@ public interface UserService{
   String giveAccess(String email, String userRole, Principal principal);
 
   List<UserDto> loadAll();
+  OutputResponse<UserDto> update(User user, Principal principal);
+
 }
