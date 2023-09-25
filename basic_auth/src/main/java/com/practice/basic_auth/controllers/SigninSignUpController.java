@@ -8,6 +8,7 @@ import com.practice.basic_auth.payloads.OutputResponse;
 import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.security.JwtHelper;
 import com.practice.basic_auth.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class SigninSignUpController {
 
   //create user
   @PostMapping("/signup")
-  public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
+  public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody User user){
     OutputResponse<UserDto> createdUser= userService.createUser(user);
     if(createdUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);

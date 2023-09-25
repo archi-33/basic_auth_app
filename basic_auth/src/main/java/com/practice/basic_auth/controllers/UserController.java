@@ -51,6 +51,13 @@ public class UserController {
   }
 
 
+  @PutMapping("/update")
+  @PreAuthorize("ROLE_USER")
+  public List<UserDto> updateUserDetail(Principal principal) {
+    return userService.update();
+  }
+
+
 
 
 
