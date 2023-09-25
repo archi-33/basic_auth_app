@@ -5,8 +5,6 @@ import com.practice.basic_auth.payloads.OutputResponse;
 import com.practice.basic_auth.payloads.UserDto;
 import java.security.Principal;
 import java.util.List;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 public interface UserService{

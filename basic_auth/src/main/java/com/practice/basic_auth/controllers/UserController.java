@@ -18,11 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +33,7 @@ public class UserController {
   private UserService userService;
 
 
-  @GetMapping("/access")
+  @PutMapping("/access")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public  String giveAccessToUser(@RequestParam String email, @RequestParam String userRole, Principal principal){
     return userService.giveAccess(email, userRole, principal);
@@ -61,6 +57,15 @@ public class UserController {
     }
   }
 
+  @GetMapping("/getName")
+  @PreAuthorize("hasRole('ROLE_USER')")
+  public String giveName(Principal principal)
+  {
+    return principal.getName();
+  }
+  ;
+
+
 
 
 
@@ -76,20 +81,7 @@ public class UserController {
 //      return new ResponseEntity<>((new ApiResponse("error",null, user.getMessage())), HttpStatus.BAD_REQUEST);
 //  }
 
-//  @GetMapping("/test")
-//  public String sayHello(){
-//    return "Saying hello after login.";
-//  }
 
-  @GetMapping("/getName")
-  @PreAuthorize("hasRole('ROLE_USER')")
-  public String giveName(Principal principal){
-    return principal.getName();
-  }
-//
-//  @PutMapping("/update")
-//  public UserDto update(){
-//  }
 
 }
 

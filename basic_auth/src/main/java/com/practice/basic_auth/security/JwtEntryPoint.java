@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 public class JwtEntryPoint implements AuthenticationEntryPoint {
 
   @Override
-  public void commence(HttpServletRequest request, HttpServletResponse response,
-      AuthenticationException authException) throws IOException, ServletException {
+  public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     PrintWriter writer = response.getWriter();
     writer.println("Access Denied !! " + authException.getMessage());
