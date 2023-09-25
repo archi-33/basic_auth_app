@@ -41,12 +41,12 @@ public class SigninSignUpController {
 
   //create user
   @PostMapping("/signup")
-  public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody User user){
+  public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
     OutputResponse<UserDto> createdUser= userService.createUser(user);
     if(createdUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
     }else
-      return new ResponseEntity<>((new ApiResponse("error",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>((new ApiResponse("failure",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
   }
 
   @PostMapping("/login")
@@ -61,7 +61,7 @@ public class SigninSignUpController {
     if(getUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success","token = "+token,null)), HttpStatus.CREATED);
     }else
-      return new ResponseEntity<>((new ApiResponse("error",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>((new ApiResponse("failure",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
 
   }
 

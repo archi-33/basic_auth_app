@@ -53,8 +53,13 @@ public class UserController {
 
   @PutMapping("/update")
   @PreAuthorize("ROLE_USER")
-  public List<UserDto> updateUserDetail(Principal principal) {
-    return userService.update();
+  public ResponseEntity<ApiResponse> updateUserDetail(User user, Principal principal) {
+    OutputResponse<UserDto> getUser =userService.update(user, principal);
+    if(getUser.getSuccess()){
+      return new ResponseEntity<>((new ApiResponse("success",getUser.getData(),null)), HttpStatus.OK);
+    }else{
+      return new ResponseEntity<>((new ApiResponse("failure",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
+    }
   }
 
 
