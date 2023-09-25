@@ -27,7 +27,6 @@ public class CustomUserDetail implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-
     return authorities;
   }
 
@@ -60,4 +59,6 @@ public class CustomUserDetail implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
+
+  ;
 }
