@@ -1,7 +1,8 @@
 package com.practice.basic_auth.services.impl;
 
 import com.practice.basic_auth.entities.User;
-import com.practice.basic_auth.payloads.OutputResponse;
+import com.practice.basic_auth.payloads.ServiceResponse;
+import com.practice.basic_auth.payloads.UpdateUserDetailsDto;
 import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.repositories.UserRepo;
 import com.practice.basic_auth.services.UserService;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class UserServiceimpl implements UserService {
   private UserRepo userRepo;
 
   @Override
-  public OutputResponse<UserDto> createUser(User user) {
+  public ServiceResponse<UserDto> createUser(User user) {
 
 
 
@@ -44,14 +44,14 @@ public class UserServiceimpl implements UserService {
       userDto.setLastName(savedUser.getLastName());
       userDto.setGender(savedUser.getGender());
       userDto.setId(savedUser.getId());
-      return new OutputResponse<>(true, userDto, "Successfully created the user... PLEASE LOGIN!!!!!");
+      return new ServiceResponse<>(true, userDto, "Successfully created the user... PLEASE LOGIN!!!!!");
     }else{
-      return new OutputResponse<>(false, null,"The specified Email id is already present");
+      return new ServiceResponse<>(false, null,"The specified Email id is already present");
     }
   }
 
   @Override
-  public OutputResponse<UserDto> getUser(String email, String password) {
+  public ServiceResponse<UserDto> getUser(String email, String password) {
 
     Optional<User> userOpt=userRepo.findByEmail(email);
 
@@ -64,23 +64,23 @@ public class UserServiceimpl implements UserService {
         userDto.setLastName(user.getLastName());
         userDto.setGender(user.getGender());
         userDto.setId(user.getId());
-        return new OutputResponse<>(true,  userDto, "User logged in successfully.");
+        return new ServiceResponse<>(true,  userDto, "User logged in successfully.");
 
       }
       else{
-        return new OutputResponse<>(false, null, "Entered Password is wrong");
+        return new ServiceResponse<>(false, null, "Entered Password is wrong");
       }
     }else
-      return new OutputResponse<>(false, null, "Entered Email ID does not exist");
+      return new ServiceResponse<>(false, null, "Entered Email ID does not exist");
   }
 
-  public User getLoggedInUser(Principal principal){
-    return userRepo.findByEmail(principal.getName()).get();
+  public User getLoggedInUser(String email){
+    return userRepo.findByEmail(email).get();
   }
 
   public static final String[] adminAccess= {"ROLE_ADMIN", "ROLE_USER"};
-  public List<String> getRolesOfLoggedInUser(Principal principal){
-    String roles = getLoggedInUser(principal).getRole();
+  public List<String> getRolesOfLoggedInUser(String email){
+    String roles = getLoggedInUser(email).getRole();
     List<String> assignRoles = Arrays.stream(roles.split(",")).collect(Collectors.toList());
     if(assignRoles.contains("ROLE_ADMIN")) {
       return Arrays.stream(adminAccess).collect(Collectors.toList());
@@ -88,16 +88,25 @@ public class UserServiceimpl implements UserService {
     else
       return List.of(new String[]{"ROLE_USER"});
   }
-  public String giveAccess(String email, String userRole, Principal principal){
+  public ServiceResponse<User> giveAccess(String email, String userRole, Principal principal){
     User user = userRepo.findByEmail(email).get();
-    List<String> activeRoles = getRolesOfLoggedInUser(principal);
-    String newRole ="";
-    if(activeRoles.contains(userRole)){
-      newRole= user.getRole()+","+userRole;
-      user.setRole(newRole);
+    if(user!=null) {
+      List<String> activeRoles = getRolesOfLoggedInUser(email);
+      String newRole = "";
+      if (!(activeRoles.contains(userRole))) {
+        newRole = user.getRole() + "," + userRole;
+        user.setRole(newRole);
+        userRepo.save(user);
+        return new ServiceResponse<>(true, user,
+            "Hello!!! " + user.getEmail() + ". New Role has been assigned to you by "
+                + principal.getName() + "i.e., " + user.getRole());
+
+      } else {
+        return new ServiceResponse<>(false, user, "The user is already " + userRole);
+      }
     }
-    userRepo.save(user);
-    return "Hello!!! "+user.getEmail()+". New Role has been assigned to you by "+principal.getName()+"i.e., "+user.getRole();
+    return new ServiceResponse<>(false, null, "cannot find the user with specified mail..!!!!");
+
   }
 
   @Override
@@ -113,22 +122,22 @@ public class UserServiceimpl implements UserService {
   }
 
   @Override
-  public OutputResponse<UserDto> update(User user, Principal principal) {
+  public ServiceResponse<UserDto> update(UpdateUserDetailsDto updateUserDetailsDto, Principal principal) {
     User loggedinUser = userRepo.findByEmail(principal.getName()).get();
-    Optional<User> ifPresent = userRepo.findByEmail(user.getEmail());
-    if(ifPresent.isEmpty()){
-      loggedinUser.setEmail(user.getEmail());
-      loggedinUser.setFirstName(user.getFirstName());
-      loggedinUser.setLastName(user.getLastName());
-      loggedinUser.setPassword(passwordEncoder.encode(user.getPassword()));
+    Optional<User> checkNewMail = userRepo.findByEmail(updateUserDetailsDto.getEmail());
+    if(checkNewMail.isEmpty()){
+      loggedinUser.setEmail(updateUserDetailsDto.getEmail());
+      loggedinUser.setFirstName(updateUserDetailsDto.getFirstName());
+      loggedinUser.setLastName(updateUserDetailsDto.getLastName());
+      loggedinUser.setPassword(passwordEncoder.encode(updateUserDetailsDto.getPassword()));
       userRepo.save(loggedinUser);
 
     }
     else{
-      return new OutputResponse<>(false, null,"Given mail id is already present...!!!!");
+      return new ServiceResponse<>(false, null,"Given mail id is already present...!!!!");
 
     }
-    return new OutputResponse<>(true, new UserDto(user),"The user details are successfully updated...");
+    return new ServiceResponse<>(true, new UserDto(updateUserDetailsDto),"The user details are successfully updated...");
 
   }
 

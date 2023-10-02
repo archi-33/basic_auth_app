@@ -2,13 +2,12 @@ package com.practice.basic_auth.controllers;
 
 import com.practice.basic_auth.entities.User;
 import com.practice.basic_auth.payloads.ApiResponse;
+import com.practice.basic_auth.payloads.Error;
 import com.practice.basic_auth.payloads.JwtRequest;
-import com.practice.basic_auth.payloads.JwtResponse;
-import com.practice.basic_auth.payloads.OutputResponse;
+import com.practice.basic_auth.payloads.ServiceResponse;
 import com.practice.basic_auth.payloads.UserDto;
 import com.practice.basic_auth.security.JwtHelper;
 import com.practice.basic_auth.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +41,11 @@ public class SigninSignUpController {
   //create user
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
-    OutputResponse<UserDto> createdUser= userService.createUser(user);
+    ServiceResponse<UserDto> createdUser= userService.createUser(user);
     if(createdUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
     }else
-      return new ResponseEntity<>((new ApiResponse("failure",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(createdUser.getMessage()))), HttpStatus.BAD_REQUEST);
   }
 
   @PostMapping("/login")
@@ -56,12 +55,12 @@ public class SigninSignUpController {
     String token= jwtHelper.generateToken(user);
 //    ApiResponse response = new ApiResponse();
 //    response.setData(token);
-    OutputResponse<UserDto> getUser= userService.getUser(jwtRequest.getEmail(),
+    ServiceResponse<UserDto> getUser= userService.getUser(jwtRequest.getEmail(),
         jwtRequest.getPassword());
     if(getUser.getSuccess()){
       return new ResponseEntity<>((new ApiResponse("success","token = "+token,null)), HttpStatus.CREATED);
     }else
-      return new ResponseEntity<>((new ApiResponse("failure",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
 
   }
 
