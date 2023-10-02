@@ -37,35 +37,42 @@ public class SigninSignUpController {
   private UserService userService;
 
   @PostMapping("/signup")
-  public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
-    OutputResponse<UserDto> createdUser= userService.createUser(user);
-    if(createdUser.getSuccess()){
-      return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
-    }else
-      return new ResponseEntity<>((new ApiResponse("failure",null, createdUser.getMessage())), HttpStatus.BAD_REQUEST);
+  public ResponseEntity<ApiResponse> createUser(@RequestBody User user) {
+    OutputResponse<UserDto> createdUser = userService.createUser(user);
+    if (createdUser.getSuccess()) {
+      return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(), null)),
+          HttpStatus.CREATED);
+    } else {
+      return new ResponseEntity<>((new ApiResponse("failure", null, createdUser.getMessage())),
+          HttpStatus.BAD_REQUEST);
+    }
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse> createToken(@RequestBody JwtRequest jwtRequest){
-    this.doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
+  public ResponseEntity<ApiResponse> createToken(@RequestBody JwtRequest jwtRequest) {
+    doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
     final UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
-    String token= jwtHelper.generateToken(user);
-    OutputResponse<UserDto> getUser= userService.getUser(jwtRequest.getEmail(),
+    String token = jwtHelper.generateToken(user);
+    OutputResponse<UserDto> getUser = userService.getUser(jwtRequest.getEmail(),
         jwtRequest.getPassword());
-    if(getUser.getSuccess()){
-      return new ResponseEntity<>((new ApiResponse("success","token = "+token,null)), HttpStatus.CREATED);
-    }else
-      return new ResponseEntity<>((new ApiResponse("failure",null, getUser.getMessage())), HttpStatus.BAD_REQUEST);
+    if (getUser.getSuccess()) {
+      return new ResponseEntity<>((new ApiResponse("success", "token = " + token, null)),
+          HttpStatus.CREATED);
+    } else {
+      return new ResponseEntity<>((new ApiResponse("failure", null, getUser.getMessage())),
+          HttpStatus.BAD_REQUEST);
+    }
 
   }
 
-  public void doAuthenticate(String username, String password){
-    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+  public void doAuthenticate(String username, String password) {
+    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+        username, password);
     authenticationManager.authenticate(authenticationToken);
   }
 
   @ExceptionHandler(BadCredentialsException.class)
-  public String exceptionHandler(){
+  public String exceptionHandler() {
     return "Bad Credentials!!!!!!!!!!!!!!";
   }
 
