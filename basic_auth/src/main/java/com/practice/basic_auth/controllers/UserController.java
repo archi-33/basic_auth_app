@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -78,7 +79,7 @@ public class UserController {
    *                             user.
    * @return ResponseEntity containing ApiResponse with success message or error message.
    */
-  @PutMapping("/update")
+  @PutMapping("/updateOwnDetails")
   @PreAuthorize("hasRole('ROLE_USER')")
   public ResponseEntity<ApiResponse> updateUserDetail(
       @RequestBody UpdateUserDetailsDto updateUserDetailsDto, Principal principal) {
@@ -93,16 +94,26 @@ public class UserController {
     }
   }
 
-//  @PutMapping("/update")
-//  @PreAuthorize("hasRole('ROLE_ADMIN')")
-//  public ResponseEntity<ApiResponse> updateAnyUserDetail(@RequestBody UpdateUserDetailsDto updateUserDetailsDto, Principal principal) {
-//    ServiceResponse<UserDto> getUser =userService.update(updateUserDetailsDto, principal);
-//    if(getUser.getSuccess()){
-//      return new ResponseEntity<>((new ApiResponse("success",getUser.getData(),null)), HttpStatus.OK);
-//    }else{
-//      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
-//    }
-//  }
+  /**
+   * Endpoint for updating the details of any user by the currently authenticated user with the 'ROLE_ADMIN'
+   * role.
+   *
+   * @param id The id of the user whose details needs to be updated.
+   * @param updateUserDetailsDto The UpdateUserDetailsDto containing updated user details.
+   * @param principal            The Principal object representing the currently authenticated
+   *                             user.
+   * @return ResponseEntity containing ApiResponse with success message or error message.
+   */
+  @PutMapping("/update")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  public ResponseEntity<ApiResponse> updateAnyUserDetail(@RequestParam Integer id, @RequestBody UpdateUserDetailsDto updateUserDetailsDto, Principal principal) {
+    ServiceResponse<UserDto> getUser =userService.updateAnyUser(id,updateUserDetailsDto, principal);
+    if(getUser.getSuccess()){
+      return new ResponseEntity<>((new ApiResponse("success",getUser.getData(),null)), HttpStatus.OK);
+    }else{
+      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
+    }
+  }
 
   /**
    * Endpoint for retrieving the name of the currently authenticated user with the 'ROLE_USER'

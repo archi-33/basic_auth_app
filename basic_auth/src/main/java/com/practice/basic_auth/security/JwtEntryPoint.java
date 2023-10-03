@@ -1,23 +1,35 @@
 /**
- * Custom JWT authentication entry point for handling unauthorized access in the application.
+ * Custom JWT authentication entry point for handling unauthorized access in the application. This
+ * class is responsible for responding with an unauthorized status and message when authentication
+ * fails.
  */
 package com.practice.basic_auth.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice.basic_auth.payloads.ApiResponse;
+import com.practice.basic_auth.payloads.Error;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 
 /**
- * Custom authentication entry point that responds with an unauthorized status and message when authentication fails.
+ * Custom authentication entry point that responds with an unauthorized status and message when
+ * authentication fails.
  */
 @Component
 public class JwtEntryPoint implements AuthenticationEntryPoint {
+
+  @Autowired
+  private JwtHelper jwtHelper;
 
   /**
    * Handles unauthorized access by setting the response status and providing an error message.
@@ -32,9 +44,39 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
   public void commence(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException authException) throws IOException, ServletException {
 
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    String requestHeader = request.getHeader("Authorization");
+
+    if (requestHeader == null) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    } else if (requestHeader != null && requestHeader.startsWith("Bearer")) {
+      String token = requestHeader.substring(7);
+      try {
+        jwtHelper.getUsernameFromToken(token);
+      } catch (Exception e) {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      }
+
+    } else {
+      response.setStatus(HttpStatus.FORBIDDEN.value());
+    }
+
+    ApiResponse apiResponse = new ApiResponse();
+    apiResponse.setStatus("error");
+    apiResponse.setData(null);
+    Error error = new Error();
+    error.setErrorMessage("Access Denied !! " + authException.getMessage());
+    apiResponse.setError(error);
+
+    // Serialize the JSON response
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonResponse = objectMapper.writeValueAsString(apiResponse);
+
+    // Set the response content type to JSON
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
     PrintWriter writer = response.getWriter();
-    writer.println("Access Denied !! " + authException.getMessage());
+    writer.println(jsonResponse);
+
 
   }
 }

@@ -21,27 +21,27 @@ public class UpdateUserDetailsDto {
    * The new updated email address of the user.
    */
   @Email
-  private String email;
+  private String updatedMail;
 
   /**
    * The new password for the user (optional).
    */
-  private String password;
+  private String updatedPassword;
 
   /**
    * The updated first name of the user.
    */
-  private String firstName;
+  private String updatedFirstName;
 
   /**
    * The updated last name of the user.
    */
-  private String lastName;
+  private String updatedLastName;
 
   /**
    * The updated gender of the user.
    */
-  private String gender;
+  private String updatedGender;
 
 
 }
