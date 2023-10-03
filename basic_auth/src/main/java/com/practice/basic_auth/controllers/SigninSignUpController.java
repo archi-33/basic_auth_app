@@ -1,3 +1,6 @@
+/**
+ * Controller class for handling user sign-up and login operations.
+ */
 package com.practice.basic_auth.controllers;
 
 import com.practice.basic_auth.entities.User;
@@ -37,39 +40,70 @@ public class SigninSignUpController {
   @Autowired
   private UserService userService;
 
+  /**
+   * Endpoint for creating a new user.
+   *
+   * @param user The User object to be created.
+   * @return ResponseEntity containing ApiResponse with success message or error message.
+   */
   @PostMapping("/signup")
-  public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
-    ServiceResponse<UserDto> createdUser= userService.createUser(user);
-    if(createdUser.getSuccess()){
-      return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
-    }else
-      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(createdUser.getMessage()))), HttpStatus.BAD_REQUEST);
+  public ResponseEntity<ApiResponse> createUser(@RequestBody User user) {
+    ServiceResponse<UserDto> createdUser = userService.createUser(user);
+    if (createdUser.getSuccess()) {
+      return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(), null)),
+          HttpStatus.CREATED);
+    } else {
+      return new ResponseEntity<>(
+          (new ApiResponse("failure", null, new Error(createdUser.getMessage()))),
+          HttpStatus.BAD_REQUEST);
+    }
 
   }
 
+  /**
+   * Endpoint for generating an authentication token based on user credentials.
+   *
+   * @param jwtRequest The JwtRequest object containing user email and password.
+   * @return ResponseEntity containing ApiResponse with success message and generated token or error message.
+   */
   @PostMapping("/login")
   public ResponseEntity<ApiResponse> createToken(@RequestBody JwtRequest jwtRequest) {
     doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
     final UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
-    String token= jwtHelper.generateToken(user);
+    String token = jwtHelper.generateToken(user);
 //    ApiResponse response = new ApiResponse();
 //    response.setData(token);
-    ServiceResponse<UserDto> getUser= userService.getUser(jwtRequest.getEmail(),
+    ServiceResponse<UserDto> getUser = userService.getUser(jwtRequest.getEmail(),
         jwtRequest.getPassword());
-    if(getUser.getSuccess()){
-      return new ResponseEntity<>((new ApiResponse("success","token = "+token,null)), HttpStatus.CREATED);
-    }else
-      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
+    if (getUser.getSuccess()) {
+      return new ResponseEntity<>((new ApiResponse("success", "token = " + token, null)),
+          HttpStatus.CREATED);
+    } else {
+      return new ResponseEntity<>(
+          (new ApiResponse("failure", null, new Error(getUser.getMessage()))),
+          HttpStatus.BAD_REQUEST);
+    }
 
 
   }
 
+  /**
+   * Perform user authentication.
+   *
+   * @param username User's email.
+   * @param password User's password.
+   */
   public void doAuthenticate(String username, String password) {
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
         username, password);
     authenticationManager.authenticate(authenticationToken);
   }
 
+  /**
+   * Exception handler for BadCredentialsException.
+   *
+   * @return Error message for bad credentials.
+   */
   @ExceptionHandler(BadCredentialsException.class)
   public String exceptionHandler() {
     return "Bad Credentials!!!!!!!!!!!!!!";

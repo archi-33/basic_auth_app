@@ -1,3 +1,6 @@
+/**
+ * Configuration class for security settings in the application.
+ */
 package com.practice.basic_auth.config;
 
 import com.practice.basic_auth.security.JwtAuthFilter;
@@ -19,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig{
+public class SecurityConfig {
 
   @Autowired
   private JwtEntryPoint point;
@@ -32,22 +35,35 @@ public class SecurityConfig{
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-
+  /**
+   * Configures the security filter chain for HTTP requests.
+   *
+   * @param http The HttpSecurity object to configure.
+   * @return The configured SecurityFilterChain.
+   * @throws Exception If an error occurs during configuration.
+   */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     http.csrf(csrf -> csrf.disable())
         .cors(cors -> cors.disable())
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("api/auth/signup","/api/auth/login").permitAll().anyRequest().authenticated())
+            .requestMatchers("api/auth/signup", "/api/auth/login").permitAll().anyRequest()
+            .authenticated())
         .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-    http.addFilterBefore(filter,UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
 
+  /**
+   * Configures a DaoAuthenticationProvider for authenticating users.
+   *
+   * @return The configured DaoAuthenticationProvider.
+   */
   @Bean
   public DaoAuthenticationProvider daoAuthenticationProvider() {
 
@@ -57,8 +73,6 @@ public class SecurityConfig{
     return daoAuthenticationProvider;
 
   }
-
-
 
   //  @Bean
 //  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -74,8 +88,6 @@ public class SecurityConfig{
 //    http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 //    return http.build();
 //  }
-
-
 
 
 }

@@ -1,3 +1,6 @@
+/**
+ * Controller class for managing user-related operations.
+ */
 package com.practice.basic_auth.controllers;
 
 import com.practice.basic_auth.entities.User;
@@ -26,38 +29,67 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @EnableMethodSecurity
 public class UserController {
+
   @Autowired
   private UserService userService;
 
-
+  /**
+   * Endpoint for granting access to a user with the 'ROLE_ADMIN' role.
+   *
+   * @param updateRoleDto The UpdateRoleDto containing user email and role.
+   * @param principal     The Principal object representing the currently authenticated user.
+   * @return ResponseEntity containing ApiResponse with success message or error message.
+   */
   @PutMapping("/access")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Secured("ROLE_ADMIN")
-  public ResponseEntity<ApiResponse> giveAccessToUser(@RequestBody UpdateRoleDto updateRoleDto, Principal principal){
-    ServiceResponse<User> getUser =userService.giveAccess(updateRoleDto.getEmail(), updateRoleDto.getRole(), principal);
-    if(getUser.getSuccess()){
-      return new ResponseEntity<>((new ApiResponse("success",new UserDto(getUser.getData()),null)), HttpStatus.OK);
-    }else{
-      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
+  public ResponseEntity<ApiResponse> giveAccessToUser(@RequestBody UpdateRoleDto updateRoleDto,
+      Principal principal) {
+    ServiceResponse<User> getUser = userService.giveAccess(updateRoleDto.getEmail(),
+        updateRoleDto.getRole(), principal);
+    if (getUser.getSuccess()) {
+      return new ResponseEntity<>(
+          (new ApiResponse("success", new UserDto(getUser.getData()), null)), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(
+          (new ApiResponse("failure", null, new Error(getUser.getMessage()))),
+          HttpStatus.BAD_REQUEST);
     }
   }
 
+  /**
+   * Endpoint for loading all users, accessible only to users with the 'ROLE_ADMIN' role.
+   *
+   * @return List of UserDto objects representing all users.
+   */
   @GetMapping("/fetchAllUsers")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Secured("ROLE_ADMIN")
-  public List<UserDto> loadUsers(){
+  public List<UserDto> loadUsers() {
     return userService.loadAll();
   }
 
-
+  /**
+   * Endpoint for updating the details of the currently authenticated user with the 'ROLE_USER'
+   * role.
+   *
+   * @param updateUserDetailsDto The UpdateUserDetailsDto containing updated user details.
+   * @param principal            The Principal object representing the currently authenticated
+   *                             user.
+   * @return ResponseEntity containing ApiResponse with success message or error message.
+   */
   @PutMapping("/update")
   @PreAuthorize("hasRole('ROLE_USER')")
-  public ResponseEntity<ApiResponse> updateUserDetail(@RequestBody UpdateUserDetailsDto updateUserDetailsDto, Principal principal) {
-    ServiceResponse<UserDto> getUser =userService.update(updateUserDetailsDto, principal);
-    if(getUser.getSuccess()){
-      return new ResponseEntity<>((new ApiResponse("success",getUser.getData(),null)), HttpStatus.OK);
-    }else{
-      return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
+  public ResponseEntity<ApiResponse> updateUserDetail(
+      @RequestBody UpdateUserDetailsDto updateUserDetailsDto, Principal principal) {
+    ServiceResponse<UserDto> getUser = userService.update(updateUserDetailsDto, principal);
+    if (getUser.getSuccess()) {
+      return new ResponseEntity<>((new ApiResponse("success", getUser.getData(), null)),
+          HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(
+          (new ApiResponse("failure", null, new Error(getUser.getMessage()))),
+          HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -72,10 +104,16 @@ public class UserController {
 //    }
 //  }
 
+  /**
+   * Endpoint for retrieving the name of the currently authenticated user with the 'ROLE_USER'
+   * role.
+   *
+   * @param principal The Principal object representing the currently authenticated user.
+   * @return The name of the authenticated user.
+   */
   @GetMapping("/getName")
-  @PreAuthorize("hasRole('ROLE_USER')")
-  public String giveName(Principal principal)
-  {
+  @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+  public String giveName(Principal principal) {
     return principal.getName();
   }
 
@@ -85,14 +123,6 @@ public class UserController {
 //  return new Exc
 //}
 
-
-
-
-
-
-
-
-
 //  @PostMapping("/signin")
 //  public ResponseEntity<ApiResponse> signin(@RequestBody LoginDto loginDto) {
 //    OutputResponse<UserDto> user = userService.getUser(loginDto.getEmail(), loginDto.getPassword());
@@ -101,7 +131,6 @@ public class UserController {
 //    }else
 //      return new ResponseEntity<>((new ApiResponse("error",null, user.getMessage())), HttpStatus.BAD_REQUEST);
 //  }
-
 
 
 }
