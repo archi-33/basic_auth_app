@@ -57,4 +57,14 @@ public interface UserService {
    */
   ServiceResponse<UserDto> update(UpdateUserDetailsDto updateUserDetailsDto, Principal principal);
 
+  /**
+   * Updates any user details.
+   *
+   * @param id The id of the user whose details needs to be updated.
+   * @param updateUserDetailsDto The updated user details.
+   * @param principal            The Principal object representing the currently logged-in user.
+   * @return A ServiceResponse indicating whether the update was successful and providing details.
+   */
+  ServiceResponse<UserDto> updateAnyUser(Integer id, UpdateUserDetailsDto updateUserDetailsDto, Principal principal);
+
 }

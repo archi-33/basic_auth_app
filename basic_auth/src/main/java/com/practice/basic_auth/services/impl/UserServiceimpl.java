@@ -200,12 +200,12 @@ public class UserServiceimpl implements UserService {
   public ServiceResponse<UserDto> update(UpdateUserDetailsDto updateUserDetailsDto,
       Principal principal) {
     User loggedinUser = userRepo.findByEmail(principal.getName()).get();
-    Optional<User> checkNewMail = userRepo.findByEmail(updateUserDetailsDto.getEmail());
+    Optional<User> checkNewMail = userRepo.findByEmail(updateUserDetailsDto.getUpdatedMail());
     if (checkNewMail.isEmpty()) {
-      loggedinUser.setEmail(updateUserDetailsDto.getEmail());
-      loggedinUser.setFirstName(updateUserDetailsDto.getFirstName());
-      loggedinUser.setLastName(updateUserDetailsDto.getLastName());
-      loggedinUser.setPassword(passwordEncoder.encode(updateUserDetailsDto.getPassword()));
+      loggedinUser.setEmail(updateUserDetailsDto.getUpdatedMail());
+      loggedinUser.setFirstName(updateUserDetailsDto.getUpdatedFirstName());
+      loggedinUser.setLastName(updateUserDetailsDto.getUpdatedLastName());
+      loggedinUser.setPassword(passwordEncoder.encode(updateUserDetailsDto.getUpdatedPassword()));
       userRepo.save(loggedinUser);
 
     } else {
@@ -214,6 +214,38 @@ public class UserServiceimpl implements UserService {
     }
     return new ServiceResponse<>(true, new UserDto(updateUserDetailsDto),
         "The user details are successfully updated...");
+
+  }
+
+  /**
+   * Updates user details.
+   *
+   * @param id The id of the user whose details needs to be updated.
+   * @param updateUserDetailsDto The updated user details.
+   * @param principal            The Principal object representing the currently logged-in user.
+   * @return A ServiceResponse indicating whether the update was successful and providing details.
+   */
+  @Override
+  public ServiceResponse<UserDto> updateAnyUser(Integer id, UpdateUserDetailsDto updateUserDetailsDto,
+      Principal principal) {
+    Optional<User> updateDetailsOfUser = userRepo.findById(id);
+    if(updateDetailsOfUser.isEmpty()){
+      return new ServiceResponse<>(false, null, "Given id of the user is not present.PLEASE CHECK THE ID OF THE USER TO BE UPDATED..!!!!");
+    }
+    Optional<User> checkNewMail = userRepo.findByEmail(updateUserDetailsDto.getUpdatedMail());
+    if (checkNewMail.isEmpty()) {
+      updateDetailsOfUser.get().setEmail(updateUserDetailsDto.getUpdatedMail());
+      updateDetailsOfUser.get().setFirstName(updateUserDetailsDto.getUpdatedFirstName());
+      updateDetailsOfUser.get().setLastName(updateUserDetailsDto.getUpdatedLastName());
+      updateDetailsOfUser.get().setPassword(passwordEncoder.encode(updateUserDetailsDto.getUpdatedPassword()));
+      userRepo.save(updateDetailsOfUser.get());
+
+    } else {
+      return new ServiceResponse<>(false, null, "Given mail id to be updated is already present.TRY ANOTHER MAIL..!!!!");
+
+    }
+    return new ServiceResponse<>(true, new UserDto(updateUserDetailsDto),
+        "The user details of "+updateDetailsOfUser.get().getEmail()+" are successfully updated by "+principal.getName());
 
   }
 

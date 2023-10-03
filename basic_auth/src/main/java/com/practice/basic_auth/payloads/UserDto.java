@@ -69,10 +69,10 @@ public class UserDto {
    * @param user The UpdateUserDetailsDto from which to create the user details.
    */
   public UserDto(UpdateUserDetailsDto user) {
-    this.email = user.getEmail();
-    this.firstName = user.getFirstName();
-    this.lastName = user.getLastName();
-    this.gender = user.getGender();
+    this.email = user.getUpdatedMail();
+    this.firstName = user.getUpdatedFirstName();
+    this.lastName = user.getUpdatedLastName();
+    this.gender = user.getUpdatedGender();
   }
 
 }
