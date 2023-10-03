@@ -1,3 +1,6 @@
+/**
+ * Configuration class for Spring Security and authentication-related beans.
+ */
 package com.practice.basic_auth.config;
 
 import org.springframework.context.annotation.Bean;
@@ -7,8 +10,15 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 @Configuration
 public class AppConfig {
+
+  /**
+   * Creates and configures a BCrypt password encoder bean.
+   *
+   * @return A BCryptPasswordEncoder instance for encoding and verifying passwords.
+   */
   @Bean
   public PasswordEncoder passwordEncoder() {
 
@@ -16,10 +26,19 @@ public class AppConfig {
 
   }
 
+  /**
+   * Creates and configures an AuthenticationManager bean.
+   *
+   * @param builder The AuthenticationConfiguration builder for building the AuthenticationManager.
+   * @return An AuthenticationManager instance for handling authentication.
+   * @throws Exception If an error occurs during the configuration.
+   */
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration builder)
+      throws Exception {
     return builder.getAuthenticationManager();
   }
+
   ;
 
 

@@ -1,6 +1,8 @@
+/**
+ * Custom JWT authentication filter for processing JWT tokens in the application.
+ */
 package com.practice.basic_auth.security;
 
-import com.practice.basic_auth.payloads.UserDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
@@ -19,8 +21,12 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * Custom JWT authentication filter that intercepts and processes incoming requests with JWT tokens.
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
   private Logger logger = LoggerFactory.getLogger(OncePerRequestFilter.class);
   @Autowired
   private JwtHelper jwtHelper;
@@ -31,7 +37,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain)
       throws ServletException, IOException {
 
     String requestHeader = request.getHeader("Authorization");
@@ -71,7 +78,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       Boolean validateToken = this.jwtHelper.validateToken(token, userDetails);
 
       if (validateToken) {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
       } else {

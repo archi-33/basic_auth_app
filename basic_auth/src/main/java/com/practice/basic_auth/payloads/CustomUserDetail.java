@@ -1,3 +1,6 @@
+/**
+ * Custom UserDetail class implementing Spring Security's UserDetails interface.
+ */
 package com.practice.basic_auth.payloads;
 
 import com.practice.basic_auth.entities.User;
@@ -9,19 +12,30 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+
+/**
+ * Custom implementation of Spring Security's UserDetails interface, representing user details.
+ */
 public class CustomUserDetail implements UserDetails {
-  private  String email;
+
+  private String email;
   private String password;
   private boolean isActive;
   private List<GrantedAuthority> authorities;
 
   private User user;
 
+  /**
+   * Constructs a CustomUserDetail object based on the provided User entity.
+   *
+   * @param user The User entity from which to create the user details.
+   */
   public CustomUserDetail(User user) {
     this.email = user.getEmail();
-    this.password= user.getPassword();
+    this.password = user.getPassword();
     this.isActive = user.isActive();
-    this.authorities = Arrays.stream(user.getRole().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    this.authorities = Arrays.stream(user.getRole().split(",")).map(SimpleGrantedAuthority::new)
+        .collect(Collectors.toList());
   }
 
 
@@ -59,6 +73,4 @@ public class CustomUserDetail implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
-
-  ;
 }
