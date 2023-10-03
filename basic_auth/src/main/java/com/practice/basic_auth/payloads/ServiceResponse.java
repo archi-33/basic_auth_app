@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  public class OutputResponse<T> {
+  public class ServiceResponse<T> {
 
     private Boolean success;
     private T data;

@@ -1,7 +1,6 @@
 package com.practice.basic_auth.payloads;
 
 import com.practice.basic_auth.entities.User;
-import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +14,7 @@ public class UserDto  {
   private String firstName;
   private String lastName;
   private String gender;
+  private String role;
 
 
   public UserDto(User user){
@@ -24,8 +24,15 @@ public class UserDto  {
     this.firstName= user.getFirstName();
     this.lastName= user.getLastName();
     this.gender= user.getGender();
-    ;
+    this.role = user.getRole();
+
   }
 
+  public UserDto(UpdateUserDetailsDto user){
+    this.email= user.getEmail();
+    this.firstName= user.getFirstName();
+    this.lastName= user.getLastName();
+    this.gender= user.getGender();
+  }
 
 }
