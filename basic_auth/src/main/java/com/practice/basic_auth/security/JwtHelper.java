@@ -15,11 +15,10 @@ import org.springframework.stereotype.Component;
 public class JwtHelper {
   public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
-
-  // public static final long JWT_TOKEN_VALIDITY = 60;
   private String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
 
-  // retrieve username from jwt token
+
+
   public String getUsernameFromToken(String token) {
     return getClaimFromToken(token, Claims::getSubject);
   }
@@ -34,18 +33,18 @@ public class JwtHelper {
     return claimsResolver.apply(claims);
   }
 
-  // for retrieveing any information from token we will need the secret key
   private Claims getAllClaimsFromToken(String token) {
     return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
   }
 
-  // check if the token has expired
+
   private Boolean isTokenExpired(String token) {
     final Date expiration = getExpirationDateFromToken(token);
     return expiration.before(new Date());
   }
 
-  // generate token for user
+
+
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
     return doGenerateToken(claims, userDetails.getUsername());
@@ -59,7 +58,7 @@ public class JwtHelper {
         .signWith(SignatureAlgorithm.HS512, secret).compact();
   }
 
-  // validate token
+
   public Boolean validateToken(String token, UserDetails userDetails) {
     final String username = getUsernameFromToken(token);
     return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

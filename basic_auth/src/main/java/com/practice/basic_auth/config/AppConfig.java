@@ -11,12 +11,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AppConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
+
     return new BCryptPasswordEncoder();
+
   }
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
     return builder.getAuthenticationManager();
   }
+  ;
+
 
 }

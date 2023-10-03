@@ -72,6 +72,21 @@ public class UserController {
 //    }
 //  }
 
+  @GetMapping("/getName")
+  @PreAuthorize("hasRole('ROLE_USER')")
+  public String giveName(Principal principal)
+  {
+    return principal.getName();
+  }
+
+//  @ExceptionHandler
+//@ExceptionHandler(AuthenticationException.class)
+//public Exception exceptionHandler() {
+//  return new Exc
+//}
+
+
+
 
 
 
@@ -87,20 +102,7 @@ public class UserController {
 //      return new ResponseEntity<>((new ApiResponse("error",null, user.getMessage())), HttpStatus.BAD_REQUEST);
 //  }
 
-//  @GetMapping("/test")
-//  public String sayHello(){
-//    return "Saying hello after login.";
-//  }
 
-  @GetMapping("/getName")
-  @PreAuthorize("hasRole('ROLE_USER')")
-  public String giveName(Principal principal){
-    return principal.getName();
-  }
-//
-//  @PutMapping("/update")
-//  public UserDto update(){
-//  }
 
 }
 

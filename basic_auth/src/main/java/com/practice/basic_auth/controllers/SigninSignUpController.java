@@ -37,8 +37,6 @@ public class SigninSignUpController {
   @Autowired
   private UserService userService;
 
-
-  //create user
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse> createUser(@RequestBody User user){
     ServiceResponse<UserDto> createdUser= userService.createUser(user);
@@ -46,11 +44,12 @@ public class SigninSignUpController {
       return new ResponseEntity<>((new ApiResponse("success", createdUser.getData(),null)), HttpStatus.CREATED);
     }else
       return new ResponseEntity<>((new ApiResponse("failure",null, new Error(createdUser.getMessage()))), HttpStatus.BAD_REQUEST);
+
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse> createToken(@RequestBody JwtRequest jwtRequest){
-    this.doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
+  public ResponseEntity<ApiResponse> createToken(@RequestBody JwtRequest jwtRequest) {
+    doAuthenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
     final UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
     String token= jwtHelper.generateToken(user);
 //    ApiResponse response = new ApiResponse();
@@ -62,15 +61,17 @@ public class SigninSignUpController {
     }else
       return new ResponseEntity<>((new ApiResponse("failure",null, new Error(getUser.getMessage()))), HttpStatus.BAD_REQUEST);
 
+
   }
 
-  public void doAuthenticate(String username, String password){
-    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+  public void doAuthenticate(String username, String password) {
+    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+        username, password);
     authenticationManager.authenticate(authenticationToken);
   }
 
   @ExceptionHandler(BadCredentialsException.class)
-  public String exceptionHandler(){
+  public String exceptionHandler() {
     return "Bad Credentials!!!!!!!!!!!!!!";
   }
 

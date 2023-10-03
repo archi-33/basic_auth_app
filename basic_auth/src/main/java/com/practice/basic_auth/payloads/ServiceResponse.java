@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
   @AllArgsConstructor
   @NoArgsConstructor
   public class ServiceResponse<T> {
+
     private Boolean success;
     private T data;
     private String message;
+
   }
 
 
