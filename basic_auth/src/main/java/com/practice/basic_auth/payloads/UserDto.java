@@ -1,8 +1,6 @@
 package com.practice.basic_auth.payloads;
 
 import com.practice.basic_auth.entities.User;
-import java.util.Collection;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
